@@ -39,8 +39,6 @@ def view_list(params):
 	completed_todos = db.get_done_todos(list_name)
 
 	result_unchecked_todos = ''
-	result_completed_todos = ''
-
 	if len(unchecked_todos) == 0:
 		utils.output('inter', { 'key': 'no_unchecked_todo',
 			'data': {
@@ -67,11 +65,10 @@ def view_list(params):
 			}
 		})
 
-	for todo in completed_todos:
-		result_completed_todos += utils.translate('list_completed_todo_element', {
-			'todo': todo['name']
-		})
-
+	result_completed_todos = ''.join(
+		utils.translate('list_completed_todo_element', {'todo': todo['name']})
+		for todo in completed_todos
+	)
 	return utils.output('end', { 'key': 'completed_todos_listed',
 		'data': {
 			'list': list_name,

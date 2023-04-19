@@ -19,10 +19,10 @@ def run(params):
 
 	realpath = os.path.dirname(os.path.realpath(__file__))
 	process = subprocess.Popen(
-	[sys.executable, realpath + '/../lib/speed_test.lib.py', '--simple'],
+		[sys.executable, f'{realpath}/../lib/speed_test.lib.py', '--simple'],
 		stdout=subprocess.PIPE,
-		stderr=subprocess.STDOUT
-    )
+		stderr=subprocess.STDOUT,
+	)
 
 	(output, err) = process.communicate()
 	p_status = process.wait()
@@ -33,9 +33,9 @@ def run(params):
 	rawoutput = output.decode('utf-8')
 
 	data = {
-		'ping': re.search('Ping:(.+?)\n', rawoutput).group(1).strip(),
-		'download': re.search('Download:(.+?)\n', rawoutput).group(1).strip(),
-		'upload': re.search('Upload:(.+?)\n', rawoutput).group(1).strip()
+		'ping': re.search('Ping:(.+?)\n', rawoutput)[1].strip(),
+		'download': re.search('Download:(.+?)\n', rawoutput)[1].strip(),
+		'upload': re.search('Upload:(.+?)\n', rawoutput)[1].strip(),
 	}
 
 	return utils.output('end', { 'key': 'done', 'data': data })

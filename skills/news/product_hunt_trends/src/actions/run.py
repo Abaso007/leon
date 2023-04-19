@@ -35,9 +35,9 @@ def run(params):
 	try:
 		url = 'https://api.producthunt.com/v1/posts'
 		if (day_date != ''):
-			url = url + '?day=' + day_date
+			url = f'{url}?day={day_date}'
 
-		r = utils.http('GET', url, { 'Authorization': 'Bearer ' + developer_token })
+		r = utils.http('GET', url, {'Authorization': f'Bearer {developer_token}'})
 		response = r.json()
 
 		if 'error' in response and response['error'] == 'unauthorized_oauth':
@@ -46,7 +46,7 @@ def run(params):
 		posts = list(enumerate(response['posts']))
 		result = ''
 
-		if len(posts) == 0:
+		if not posts:
 			return utils.output('end', 'not_found')
 
 		if limit > len(posts):

@@ -37,7 +37,7 @@ def run(params):
 				answer_key = 'month'
 
 	# Feed the languages list based on the GitHub languages list
-	for i, language in enumerate(github_lang.get_all()):
+	for language in github_lang.get_all():
 		# Find the asked language
 		if search(r'\b' + escape(language.lower()) + r'\b', params['utterance'].lower()):
 			answer_key += '_with_tech'
@@ -53,18 +53,14 @@ def run(params):
 	utils.output('inter', 'reaching')
 
 	try:
-		r = utils.http('GET', 'https://github.com/trending/' + tech_slug + '?since=' + since)
+		r = utils.http('GET', f'https://github.com/trending/{tech_slug}?since={since}')
 		soup = BeautifulSoup(r.text, features='html.parser')
 		elements = soup.select('article.Box-row', limit=limit)
 		result = ''
 
 		for i, element in enumerate(elements):
 			repository = element.h1.get_text(strip=True).replace(' ', '')
-			if (element.img != None):
-				author = element.img.get('alt')[1:]
-			else:
-				author = '?'
-
+			author = element.img.get('alt')[1:] if (element.img != None) else '?'
 			has_stars = element.select('span.d-inline-block.float-sm-right')
 			stars = 0
 
@@ -73,18 +69,20 @@ def run(params):
 				separators = [' ', ',', '.']
 
 				# Replace potential separators number
-				for j, separator in enumerate(separators):
+				for separator in separators:
 					stars = stars.replace(separator, '')
 
-			result += utils.translate('list_element', {
-						'rank': i + 1,
-						'repository_url': 'https://github.com/' + repository,
-						'repository_name': repository,
-						'author_url': 'https://github.com/' + author,
-						'author_username': author,
-						'stars_nb': stars
-					}
-				)
+			result += utils.translate(
+				'list_element',
+				{
+					'rank': i + 1,
+					'repository_url': f'https://github.com/{repository}',
+					'repository_name': repository,
+					'author_url': f'https://github.com/{author}',
+					'author_username': author,
+					'stars_nb': stars,
+				},
+			)
 
 		return utils.output('end', { 'key': answer_key,
 			'data': {

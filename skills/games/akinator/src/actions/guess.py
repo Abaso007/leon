@@ -15,7 +15,7 @@ def guess(params):
 			answer = resolver['value']
 
 	# Return no speech if no value has been found
-	if answer == None:
+	if answer is None:
 		return utils.output('end', None, { 'isInActionLoop': False })
 
 	aki = akinator.Akinator()
@@ -56,16 +56,16 @@ def guess(params):
 	aki.answer(answer)
 
 	db.upsert_session({
-        'response': aki.response,
-		'session': aki.session,
-		'signature': aki.signature,
-		'progression': aki.progression,
-        'uri': aki.uri,
-        'timestamp': aki.timestamp,
-        'server': aki.server,
-        'child_mode': aki.child_mode,
-        'frontaddr': aki.frontaddr,
-        'question_filter': aki.question_filter
-    })
+	    'response': aki.response,
+	'session': aki.session,
+	'signature': aki.signature,
+	'progression': aki.progression,
+	    'uri': aki.uri,
+	    'timestamp': aki.timestamp,
+	    'server': aki.server,
+	    'child_mode': aki.child_mode,
+	    'frontaddr': aki.frontaddr,
+	    'question_filter': aki.question_filter
+	})
 
 	return utils.output('end', aki.question, { 'showSuggestions': True })

@@ -5,8 +5,6 @@ import sys
 import os
 from json import loads
 
-packagejsonfile = open(os.path.join(os.getcwd(), 'package.json'), 'r', encoding = 'utf8')
-packagejson = loads(packagejsonfile.read())
-packagejsonfile.close()
-
+with open(os.path.join(os.getcwd(), 'package.json'), 'r', encoding = 'utf8') as packagejsonfile:
+    packagejson = loads(packagejsonfile.read())
 useragent = 'Leon-Personal-Assistant/' + packagejson['version']

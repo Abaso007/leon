@@ -7,15 +7,14 @@ import utils
 def run(params):
 	"""Check if a website is down or not"""
 
-	domains = []
 	output = ''
 
-	# Find entities from the current utterance
-	for item in params['current_entities']:
-		if item['entity'] == 'url':
-			domains.append(item['resolution']['value'].lower())
-
-	if len(domains) == 0:
+	domains = [
+		item['resolution']['value'].lower()
+		for item in params['current_entities']
+		if item['entity'] == 'url'
+	]
+	if not domains:
 		# Find entities from the context
 		for item in params['entities']:
 			if item['entity'] == 'url':
@@ -32,7 +31,7 @@ def run(params):
 		})
 
 		try:
-			r = utils.http('GET', 'http://' + domain)
+			r = utils.http('GET', f'http://{domain}')
 
 			if (r.status_code != requests.codes.ok):
 				state = 'down'
@@ -52,11 +51,14 @@ def run(params):
 		if len(domains) > 1 and i >= 0 and i + 1 < len(domains):
 			output += ' '
 
-	if len(domains) == 0:
-		return utils.output('end', { 'key': 'invalid_domain_name',
-			'data': {
-				'website_name': website_name
-			}
-		})
-
-	return utils.output('end')
+	return (
+		utils.output('end')
+		if domains
+		else utils.output(
+			'end',
+			{
+				'key': 'invalid_domain_name',
+				'data': {'website_name': website_name},
+			},
+		)
+	)

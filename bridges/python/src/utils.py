@@ -17,9 +17,8 @@ dirname = os.path.dirname(os.path.realpath(__file__))
 intent_object_path = sys.argv[1]
 codes = []
 
-intent_obj_file = open(intent_object_path, 'r', encoding = 'utf8')
-intent_obj = loads(intent_obj_file.read())
-intent_obj_file.close()
+with open(intent_object_path, 'r', encoding = 'utf8') as intent_obj_file:
+	intent_obj = loads(intent_obj_file.read())
 
 def get_intent_obj():
 	"""Return intent object"""
@@ -34,31 +33,22 @@ def translate(key, dict = { }):
 	sleep(0.1)
 
 	output = ''
-	variables = { }
-
-	file = open(os.path.join(os.getcwd(), 'skills', intent_obj['domain'], intent_obj['skill'], 'config', intent_obj['lang'] + '.json'), 'r', encoding = 'utf8')
-	obj = loads(file.read())
-	file.close()
-
+	with open(os.path.join(os.getcwd(), 'skills', intent_obj['domain'], intent_obj['skill'], 'config', intent_obj['lang'] + '.json'), 'r', encoding = 'utf8') as file:
+		obj = loads(file.read())
 	# In case the key is a raw answer
 	if key not in obj['answers']:
 		return key
 
 	prop = obj['answers'][key]
-	if 'variables' in obj:
-		variables = obj['variables']
-	if isinstance(prop, list):
-		output = choice(prop)
-	else:
-		output = prop
-
+	variables = obj['variables'] if 'variables' in obj else { }
+	output = choice(prop) if isinstance(prop, list) else prop
 	if dict:
 		for key in dict:
-			output = output.replace('%' + key + '%', str(dict[key]))
+			output = output.replace(f'%{key}%', str(dict[key]))
 
 	if variables:
 		for key in variables:
-			output = output.replace('%' + key + '%', str(variables[key]))
+			output = output.replace(f'%{key}%', str(variables[key]))
 
 	return output
 
@@ -107,10 +97,8 @@ def http(method, url, headers = None):
 def config(key):
 	"""Get a skill configuration value"""
 
-	file = open(os.path.join(os.getcwd(), 'skills', intent_obj['domain'], intent_obj['skill'], 'src/config.json'), 'r', encoding = 'utf8')
-	obj = loads(file.read())
-	file.close()
-
+	with open(os.path.join(os.getcwd(), 'skills', intent_obj['domain'], intent_obj['skill'], 'src/config.json'), 'r', encoding = 'utf8') as file:
+		obj = loads(file.read())
 	return obj['configurations'][key]
 
 def create_dl_dir():
@@ -130,7 +118,15 @@ def db(db_type = 'tinydb'):
 
 	if db_type == 'tinydb':
 		ext = '.json' if os.environ.get('LEON_NODE_ENV') != 'testing' else '.spec.json'
-		db = TinyDB(os.path.join(os.getcwd(), 'skills', intent_obj['domain'], intent_obj['skill'], 'memory/db' + ext))
+		db = TinyDB(
+			os.path.join(
+				os.getcwd(),
+				'skills',
+				intent_obj['domain'],
+				intent_obj['skill'],
+				f'memory/db{ext}',
+			)
+		)
 		return {
 			'db': db,
 			'query': Query,
@@ -143,5 +139,7 @@ def get_table(slug):
 
 	domain, skill, table = slug.split('.')
 	ext = '.json' if os.environ.get('LEON_NODE_ENV') != 'testing' else '.spec.json'
-	db = TinyDB(os.path.join(os.getcwd(), 'skills', domain, skill, 'memory/db' + ext))
+	db = TinyDB(
+		os.path.join(os.getcwd(), 'skills', domain, skill, f'memory/db{ext}')
+	)
 	return db.table(table)

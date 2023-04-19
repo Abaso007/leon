@@ -45,7 +45,7 @@ def quiz(params):
 			choice = resolver['value']
 
 	# Return no speech if no value has been found
-	if choice == None:
+	if choice is None:
 		return utils.output('end', None, { 'isInActionLoop': False })
 
 	question, choice = choice.split('_')

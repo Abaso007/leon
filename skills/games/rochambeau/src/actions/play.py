@@ -40,7 +40,7 @@ def play(params):
 			player['handsign'] = entity['option']
 
 	# Exit the loop if no handsign has been found
-	if player['handsign'] == None:
+	if player['handsign'] is None:
 		utils.output('inter', None, None, { 'isInActionLoop': False })
 
 	leon_emoji = handsigns[leon['handsign']]['emoji']

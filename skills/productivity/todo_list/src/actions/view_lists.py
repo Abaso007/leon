@@ -16,14 +16,16 @@ def view_lists(params):
 	if lists_nb == 0:
 		return utils.output('end', 'no_list')
 
-	result = ''
-	# Fill end-result
-	for list_element in db.get_lists():
-		result += utils.translate('list_list_element', {
-			'list': list_element['name'],
-			'todos_nb': db.count_todos(list_element['name'])
-		})
-
+	result = ''.join(
+		utils.translate(
+			'list_list_element',
+			{
+				'list': list_element['name'],
+				'todos_nb': db.count_todos(list_element['name']),
+			},
+		)
+		for list_element in db.get_lists()
+	)
 	return utils.output('end', { 'key': 'lists_listed',
 		'data': {
 			'lists_nb': lists_nb,

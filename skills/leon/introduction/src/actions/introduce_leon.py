@@ -12,7 +12,8 @@ def introduce_leon(params):
 
 	is_owner_saved = owner != None
 
-	if is_owner_saved == False:
-		return utils.output('end', 'leon_introduction_with_question')
-
-	return utils.output('end', 'leon_introduction')
+	return (
+		utils.output('end', 'leon_introduction')
+		if is_owner_saved
+		else utils.output('end', 'leon_introduction_with_question')
+	)
